@@ -6,7 +6,7 @@ from src.utils.settings import settings
 class Base(DeclarativeBase):
     pass
 
-engine = create_engine(url=settings.db_connection )
+engine = create_engine(url=settings.DB_CONNECTION )
 
 LocalSession = sessionmaker(bind=engine)
 
