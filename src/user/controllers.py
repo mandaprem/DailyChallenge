@@ -14,7 +14,7 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
 
-def user_Register(db:Session,body:userSchema):
+def user_register(db:Session,body:userSchema):
 
     new_user_name = db.query(userModel).filter(
     userModel.user_name == body.user_name
