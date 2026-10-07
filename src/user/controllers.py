@@ -1,9 +1,10 @@
 from src.user.models import userModel
-from src.user.dtos import userSchema,loginSchema
+from src.user.dtos import userSchema,loginSchema,responseSchema
 from sqlalchemy.orm import Session
 from src.utils.settings import settings
 from pwdlib import PasswordHash
 import jwt
+from fastapi import Request
 
 
 password_hash = PasswordHash.recommended()
@@ -41,7 +42,12 @@ def user_register(db:Session,body:userSchema):
     db.add(user_data)
     db.commit()
     db.refresh(user_data)
-    return user_data
+    return {
+                 "id": user_data.id,
+                "user_name": user_data.user_name,
+                "email": user_data.email,
+                "role": user_data.role
+}
 
 
 def user_login(body:loginSchema, db:Session):
@@ -54,3 +60,31 @@ def user_login(body:loginSchema, db:Session):
 
       token = jwt.encode({"_id":user.id},settings.SECRET_KEY,settings.ALGORITHM)
       return {"token":token}
+
+def is_auth(request:Request,db:Session):
+     print(request)
+     print(request.headers)
+     token = request.headers.get("authorization")
+     if not token :
+          return {"msg":"You Are Unautherised User"}
+     token = token.split(" ")[1]
+     data = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
+
+     user = db.query(userModel).filter(userModel.id == data.get("_id")).first() 
+     if user :
+        return {
+                 "id": user.id,
+                "user_name": user.user_name,
+                "email": user.email,
+                "role": user.role
+}
+     else:
+        return {"msg" : "You Are Unautherised User"}
+    #  print(user.id)
+    #  print(user.password_hashed)
+     
+    
+    #  print(token)
+    #  print(data)
+    #  print(data.get("_id"))
+    
