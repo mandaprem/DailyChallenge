@@ -1,7 +1,5 @@
 from fastapi import FastAPI
-
 from src.utils.db import Base, engine
-
 from src.user.routes import user_routes
 from src.challenges.routes import challenge_routes
 

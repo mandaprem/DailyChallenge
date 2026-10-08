@@ -1,27 +1,41 @@
-from fastapi import FastAPI,Request,Depends
+
+from fastapi import Request, Depends, HTTPException
 from sqlalchemy.orm import Session
+import jwt
+
 from src.utils.settings import settings
 from src.user.models import userModel
-import jwt
 from src.utils.db import get_db
 
 
-def is_auth(request:Request,db:Session = Depends(get_db)):
-     print(request)
-     print(request.headers)
-     token = request.headers.get("authorization")
-     if not token :
-          return {"msg":"You Are Unautherised User"}
-     token = token.split(" ")[1]
-     data = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
+def is_auth(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    token = request.headers.get("authorization")
 
-     user = db.query(userModel).filter(userModel.id == data.get("_id")).first() 
-     if user :
-        return {
-                 "id": user.id,
-                "user_name": user.user_name,
-                "email": user.email,
-                "role": user.role
-}
-     else:
-        return {"msg" : "You Are Unautherised User"}
+    if not token:
+        raise HTTPException(
+            status_code=401,
+            detail="You Are Unauthorised User"
+        )
+
+    token = token.split(" ")[1]
+
+    data = jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        settings.ALGORITHM
+    )
+
+    user = db.query(userModel).filter(
+        userModel.id == data.get("_id")
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="You Are Unauthorised User"
+        )
+
+    return user
