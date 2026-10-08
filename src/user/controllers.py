@@ -62,8 +62,8 @@ def user_login(body:loginSchema, db:Session):
       return {"token":token}
 
 def is_auth(request:Request,db:Session):
-     print(request)
-     print(request.headers)
+    #  print(request)
+    #  print(request.headers)
      token = request.headers.get("authorization")
      if not token :
           return {"msg":"You Are Unautherised User"}
@@ -87,4 +87,11 @@ def is_auth(request:Request,db:Session):
     #  print(token)
     #  print(data)
     #  print(data.get("_id"))
-    
+
+
+def user_profile(
+    request: Request,
+    db: Session,
+    user: userModel
+):
+    return user

@@ -22,3 +22,7 @@ def user_login(body:loginSchema, db:Session = Depends(get_db)):
 @user_routes.get("/is_auth" )
 def is_auth(request:Request,db:Session = Depends(get_db)):
     return controllers.is_auth(request,db)
+
+@user_routes.get("/profile")
+def user_profile(request:Request,db:Session = Depends(get_db),user:userModel =Depends(is_auth)):
+    return controllers.user_profile(request,db,user)
